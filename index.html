@@ -33,6 +33,15 @@
 	<script type="text/javascript">
 		document.getElementById('source_box').value = localStorage.last_in ? localStorage.last_in : ''
 
+		const camelToSnakeCase = str => {
+			let result = str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)
+
+			if(result.charAt(0) == "_")
+				return result.substr(1)
+
+			return result
+		};
+
 		function convert(){
 			const src = document.getElementById('source_box').value
 			const parts = src.split("\n")
@@ -77,16 +86,18 @@
 				var result = line.match(/(?<=type\s*).*?(?=\s*struct)/gs)
 
 				if(result){
-					outputstr += `CREATE TABLE IF NOT EXISTS ${result}s (` + "\n"
+
+					let resultStr = (result + "").trim()
+					outputstr += `CREATE TABLE IF NOT EXISTS ${camelToSnakeCase(resultStr)}s (` + "\n"
 					continue
 				}
 
 				if (line.trim() == "}"){
-					outputstr += ");"
+					outputstr += ");\n"
 					outputstr = outputstr.replace(",\n)", "\n)")
 					continue
 				}
-				
+
 				if (line.trim() == "")
 					continue;
 
@@ -94,12 +105,21 @@
 					return el != ""
 				})
 
-				outputstr += "\t" +`${line_parts[0].toLowerCase()} ${getColumnType(line_parts[1])},` + "\n"
+				outputstr += "\t" +`${camelToSnakeCase(line_parts[0])} ${getColumnType(line_parts[1])},` + "\n"
 
 			}
 
 			return outputstr
 		}
+	</script>
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-D5NKRR31SN"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-D5NKRR31SN');
 	</script>
 </body>
 </html>
