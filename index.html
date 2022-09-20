@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Go struct to SQL</title>
+	<title>Golang struct to SQL</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 </head>
 <body>
@@ -15,7 +15,7 @@
 	</style>
 	<div class="container">
 		<h1><small class="badge badge-warning">Alpha</small><br/>Convert your Go struct into a SQL table</h1>
-		<p class="text-muted">Supported types are ints, float, string and time.Time. Placing a type that is unsupported will map the column as VARCHAR. The field name will be used as a column name.</p>
+		<p class="text-muted">Supported types are ints, float, string and time.Time. Placing a type that is unsupported will map the column as VARCHAR. The field name will be used as the column name. If you think this should support field tags, open an issue on this website's <a href="https://github.com/cheikhshift/struct-to-sql">repo</a> with the format you think would work best.</p>
 		<div class="row">
 			<div class="col">
 				<h4>Go Code :</h4>
