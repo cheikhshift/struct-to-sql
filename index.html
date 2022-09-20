@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Go struct to SQL</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body>
+	
+	<style type="text/css">
+		.form-control {
+			min-height: 350px;
+		}
+
+
+	</style>
+	<div class="container">
+		<h1><small class="badge badge-warning">Alpha</small><br/>Convert your Go struct into a SQL table</h1>
+		<div class="row">
+			<div class="col">
+				<h4>Go Code :</h4>
+				<textarea id="source_box" class="form-control" placeholder="Enter Go code here"></textarea>
+				
+			</div>
+			<div class="col">
+				<h4>SQL Code :</h4>
+				<textarea readonly id="result_box" class="form-control" placeholder="Resulting SQL code will be here"></textarea>
+			</div>
+		</div>
+		<hr/>
+		<button onclick="convert()" class="btn btn-block btn-lg btn-primary">Convert</button>
+	</div>
+	
+	<script type="text/javascript">
+		document.getElementById('source_box').value = localStorage.last_in ? localStorage.last_in : ''
+
+		function convert(){
+			const src = document.getElementById('source_box').value
+			const parts = src.split("\n")
+			localStorage['last_in'] = document.getElementById('source_box').value
+
+			document.getElementById('result_box').value = process(parts)
+
+		}
+
+		function getColumnType(type){
+			let result = "VARCHAR"
+			
+			const translators = [
+				{ i : "[]" , result : "VARCHAR"},
+				{ i : "int" , result : "BIGINT"},
+				{ i : "float" , result : "DECIMAL"},
+				{ i : ".Time" , result : "TIMESTAMP"},
+				{ i : "string" , result : "TEXT"},
+			]
+			
+			for(var i = 0; i < translators.length;i++){
+
+				const ca = translators[i]
+
+				if(type.includes(ca.i)){
+					result = ca.result
+					break;
+				}
+
+			}
+
+			return result
+		}
+		
+		function process(array){
+
+			outputstr = ""
+
+			for(var i = 0; i < array.length;i++){
+
+				const line = array[i]
+				var result = line.match(/(?<=type\s*).*?(?=\s*struct)/gs)
+
+				if(result){
+					outputstr += `CREATE TABLE IF NOT EXISTS ${result}s (` + "\n"
+					continue
+				}
+
+				if (line.trim() == "}"){
+					outputstr += ");"
+					outputstr = outputstr.replace(",\n)", "\n)")
+					continue
+				}
+
+				let line_parts = line.split(" ").filter(el => {
+					return el != ""
+				})
+
+				outputstr += "\t" +`${line_parts[0].toLowerCase()} ${getColumnType(line_parts[1])},` + "\n"
+
+			}
+
+			return outputstr
+		}
+	</script>
+</body>
+</html>
