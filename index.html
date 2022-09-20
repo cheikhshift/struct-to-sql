@@ -86,6 +86,9 @@
 					outputstr = outputstr.replace(",\n)", "\n)")
 					continue
 				}
+				
+				if (line.trim() == "")
+					continue;
 
 				let line_parts = line.split(" ").filter(el => {
 					return el != ""
