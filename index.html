@@ -7,7 +7,7 @@
 <body>
 	
 	<style type="text/css">
-		.form-control {
+		textarea.form-control {
 			min-height: 350px;
 		}
 
@@ -29,10 +29,44 @@
 		</div>
 		<hr/>
 		<button onclick="convert()" class="btn btn-block btn-lg btn-primary">Convert</button>
+		<div class="row">
+			<div class="col">
+				<p class="text-muted">Custom types will convert
+				the specified Go type to the specified sql type.
+				Add custom types prior to conversion. </p>
+				<input type="text" id="goType" class="form-control"
+				placeholder="Go Type name">
+				<input type="text" id="sqlType" class="form-control"
+				placeholder="SQL Type name"><br/>
+				<button onclick="AddNewType()" class="btn btn-primary btn-block">Add</button>
+			</div>
+			<div class="col">
+				<p class="text-muted">Defined types (refresh the page to <b>clear</b>)</p>
+				<div id="customTypes"></div>
+			</div>
+		</div>
 	</div>
 	
 	<script type="text/javascript">
 		document.getElementById('source_box').value = localStorage.last_in ? localStorage.last_in : ''
+
+		let typeMap = []
+
+		function AddNewType(){
+			const goType = document.getElementById('goType').value
+			const sqlType = document.getElementById('sqlType').value
+
+			if (!goType?.length || !sqlType?.length){
+
+				return alert("Please fill out all of the fields field.")
+			}
+			typeMap.push({
+				i : goType, result : sqlType
+			})
+
+			document.getElementById('customTypes').innerHTML += `<p>${goType} -> <b>${sqlType}</b></p>`
+
+		}
 
 		const camelToSnakeCase = str => {
 			let result = str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)
@@ -55,14 +89,15 @@
 		function getColumnType(type){
 			let result = "VARCHAR"
 			
-			const translators = [
+			const translators = typeMap.concat([
 				{ i : "[]" , result : "VARCHAR"},
 				{ i : "int" , result : "BIGINT"},
 				{ i : "float" , result : "DECIMAL"},
 				{ i : ".Time" , result : "TIMESTAMP"},
 				{ i : "string" , result : "TEXT"},
-			]
+			])
 			
+
 			for(var i = 0; i < translators.length;i++){
 
 				const ca = translators[i]
