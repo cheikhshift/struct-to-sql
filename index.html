@@ -62,18 +62,18 @@
 		let dialectMap = {
 			"pgrs" : process,
 			sqlite : (parts) => 
-				process(parts,[{
-					i : "time.Time" , result : "NUMERIC",
-					i : "[]" ,result : "BLOB",
-					i : "float" , result : "REAL",
-					i : "int" , result : "INTEGER",
-					i : "bool" , result : "NUMERIC",
-				}], "BLOB"),
+				process(parts,[
+					{i : "time.Time" , result : "NUMERIC" },
+					{i : "[]" ,result : "BLOB" },
+					{i : "float" , result : "REAL"},
+					{i : "int" , result : "INTEGER"},
+					{ i : "bool" , result : "NUMERIC"},
+				], "BLOB"),
 			mysql : (parts) => 
-				process(parts,[{
-					i : "bool" , result : "TINYINT",
-					i : "[]" ,result : "BLOB",
-				}], "VARCHAR(255)")
+				process(parts,[
+					{i : "bool" , result : "TINYINT"},
+					{i : "[]" ,result : "BLOB"},
+				], "VARCHAR(255)")
 		}
 
 		function AddNewType(){
@@ -114,7 +114,7 @@
 
 		}
 
-		function getColumnType(type, preset = [], def){
+		function getColumnType(type, preset, def){
 			let result = def
 			
 			const translators = typeMap.concat(
