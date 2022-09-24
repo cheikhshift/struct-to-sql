@@ -15,7 +15,15 @@
 	</style>
 	<div class="container">
 		<h1><small class="badge badge-warning">Alpha</small><br/>Convert your Go struct into a SQL table</h1>
-		<p class="text-muted">Supported types are ints, float, string and time.Time. Placing a type that is unsupported will map the column as VARCHAR. The field name will be used as the column name. If you think this should support field tags, open an issue on this website's <a href="https://github.com/cheikhshift/struct-to-sql">repo</a> with the format you think would work best.</p>
+		<p class="text-muted">Supported types are ints, float, string and time.Time. Placing a type that is unsupported will map the column as VARCHAR/BLOB, depending on the database dialect. The field name will be used as the column name. If you think this should support field tags, open an issue on this website's <a href="https://github.com/cheikhshift/struct-to-sql">repo</a> with the format you think would work best.</p>
+		<br/>
+		<label>Database Dialect</label>
+		<select id="dialect">
+          <option value="pgrs" selected>PostGresSQL</option>
+          <option value="sqlite">SQLite</option>
+          <option value="mysql" >MySQL/MariaDB</option>
+        </select>
+
 		<div class="row">
 			<div class="col">
 				<h4>Go Code :</h4>
@@ -51,6 +59,22 @@
 		document.getElementById('source_box').value = localStorage.last_in ? localStorage.last_in : ''
 
 		let typeMap = []
+		let dialectMap = {
+			"pgrs" : convert,
+			sqlite : (parts) => 
+				process(parts,[{
+					i : "time.Time" , result : "NUMERIC",
+					i : "[]" ,result : "BLOB",
+					i : "float" , result : "REAL",
+					i : "int" , result : "INTEGER",
+					i : "bool" , result : "NUMERIC",
+				}], "BLOB"),
+			mysql : (parts) => 
+				process(parts,[{
+					i : "bool" , result : "TINYINT",
+					i : "[]" ,result : "BLOB",
+				}], "VARCHAR(255)")
+		}
 
 		function AddNewType(){
 			const goType = document.getElementById('goType').value
@@ -82,20 +106,26 @@
 			const parts = src.split("\n")
 			localStorage['last_in'] = document.getElementById('source_box').value
 
-			document.getElementById('result_box').value = process(parts)
+			const dialect = document.getElementById('dialect').value
+
+			const fn = dialectMap[dialect]
+			document.getElementById('result_box').value = fn(parts)
 
 		}
 
-		function getColumnType(type){
-			let result = "VARCHAR"
+		function getColumnType(type, preset = [], def){
+			let result = def
 			
-			const translators = typeMap.concat([
-				{ i : "[]" , result : "VARCHAR"},
-				{ i : "int" , result : "BIGINT"},
-				{ i : "float" , result : "DECIMAL"},
-				{ i : ".Time" , result : "TIMESTAMP"},
-				{ i : "string" , result : "TEXT"},
-			])
+			const translators = typeMap.concat(
+				preset.concat([
+					{ i : "[]" , result : "VARCHAR"},
+					{ i : "int" , result : "BIGINT"},
+					{ i : "float" , result : "DECIMAL"},
+					{ i : ".Time" , result : "TIMESTAMP"},
+					{ i : "string" , result : "TEXT"},
+					{ i : "bool" , result : "BOOLEAN"},
+				])
+			)
 			
 
 			for(var i = 0; i < translators.length;i++){
@@ -112,7 +142,7 @@
 			return result
 		}
 		
-		function process(array){
+		function process(array, preset = [], def = "VARCHAR"){
 
 			outputstr = ""
 
@@ -141,12 +171,14 @@
 					return el != ""
 				})
 
-				outputstr += "\t" +`${camelToSnakeCase(line_parts[0])} ${getColumnType(line_parts[1])},` + "\n"
+				outputstr += "\t" +`${camelToSnakeCase(line_parts[0])} ${getColumnType(line_parts[1], preset, def)},` + "\n"
 
 			}
 
 			return outputstr
 		}
+
+
 	</script>
 	<!-- Google tag (gtag.js) -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-D5NKRR31SN"></script>
