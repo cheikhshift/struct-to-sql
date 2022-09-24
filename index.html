@@ -60,7 +60,7 @@
 
 		let typeMap = []
 		let dialectMap = {
-			"pgrs" : convert,
+			"pgrs" : process,
 			sqlite : (parts) => 
 				process(parts,[{
 					i : "time.Time" , result : "NUMERIC",
@@ -103,6 +103,7 @@
 
 		function convert(){
 			const src = document.getElementById('source_box').value
+
 			const parts = src.split("\n")
 			localStorage['last_in'] = document.getElementById('source_box').value
 
