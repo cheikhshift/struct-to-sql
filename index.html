@@ -15,7 +15,8 @@
 	</style>
 	<div class="container">
 		<h1><small class="badge badge-warning">Alpha</small><br/>Convert your Go struct into a SQL table</h1>
-		<p class="text-muted">Supported types are ints, float, string and time.Time. Placing a type that is unsupported will map the column as VARCHAR/BLOB, depending on the database dialect. The field name will be used as the column name. If you think this should support field tags, open an issue on this website's <a href="https://github.com/cheikhshift/struct-to-sql">repo</a> with the format you think would work best.</p>
+		<p class="text-muted">Supported types are ints, float, string and time.Time. Placing a type that is unsupported will map the column as VARCHAR/BLOB, depending on the database dialect. The field name will be used as the column name. There are bugs regarding CamelCase to snake case conversion. This involves a SQL column name starting with character '_', please report the input used to generate this output to the <a href="https://github.com/cheikhshift/struct-to-sql">repo</a>'s' issues.
+			<br/>If you think this should support field tags, open an issue on this website's <a href="https://github.com/cheikhshift/struct-to-sql">repo</a> with the format you think would work best.</p>
 		<br/>
 		<label>Database Dialect</label>
 		<select id="dialect">
